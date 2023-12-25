@@ -1,2 +1,2 @@
-require("lyonjohn.core")
-require("lyonjohn.lazy")
+require("johnlyon.core")
+require("johnlyon.lazy")
