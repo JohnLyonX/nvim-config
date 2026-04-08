@@ -13,7 +13,7 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({ { import = "johnlyon.plugins" }, { import = "johnlyon.plugins.lsp" } }, {
 	install = {
-		colorscheme = { "nightfly" },
+		colorscheme = { "oxocarbon" },
 	},
 	checker = {
 		enabled = true,
