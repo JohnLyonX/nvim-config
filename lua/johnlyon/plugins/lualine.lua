@@ -9,7 +9,7 @@ return {
       orange      = "#CE422B",
       insert      = "#E8845A",
       violet      = "#7A4E3E",
-      yellow      = "#D4A847",
+      yellow      = "#FABB3E",
       red         = "#A0522D",
       fg          = "#E8DDD4",
       bg          = "#1C0F0A",
