@@ -68,7 +68,6 @@ return {
 		end
 
 		local servers = {
-			"rust_analyzer",
 			"pyright",
 			"html",
 			"cssls",

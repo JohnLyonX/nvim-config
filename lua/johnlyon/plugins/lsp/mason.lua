@@ -37,7 +37,6 @@ return {
 		})
 
 		local lsp_servers = {
-			"rust_analyzer",
 			"pyright",
 			"html",
 			"cssls",
@@ -47,7 +46,6 @@ return {
 		}
 
 		local mason_packages = {
-			"rust-analyzer",
 			"pyright",
 			"html-lsp",
 			"css-lsp",

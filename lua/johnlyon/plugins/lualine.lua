@@ -6,19 +6,20 @@ return {
     local lazy_status = require("lazy.status") -- to configure lazy pending updates count
 
     local colors = {
-      blue = "#65D1FF",
-      green = "#3EFFDC",
-      violet = "#FF61EF",
-      yellow = "#FFDA7B",
-      red = "#FF4A4A",
-      fg = "#c3ccdc",
-      bg = "#112638",
-      inactive_bg = "#2c3043",
+      orange = "#ff7d00",
+      green = "#42be65",
+      violet = "#be95ff",
+      yellow = "#f1c21b",
+      red = "#fa4d56",
+      fg = "#dde1e6",
+      bg = "#161616",
+      inactive_bg = "#262626",
+      inactive_fg = "#7b818c",
     }
 
     local my_lualine_theme = {
       normal = {
-        a = { bg = colors.blue, fg = colors.bg, gui = "bold" },
+        a = { bg = colors.orange, fg = colors.bg, gui = "bold" },
         b = { bg = colors.bg, fg = colors.fg },
         c = { bg = colors.bg, fg = colors.fg },
       },
@@ -43,9 +44,9 @@ return {
         c = { bg = colors.bg, fg = colors.fg },
       },
       inactive = {
-        a = { bg = colors.inactive_bg, fg = colors.semilightgray, gui = "bold" },
-        b = { bg = colors.inactive_bg, fg = colors.semilightgray },
-        c = { bg = colors.inactive_bg, fg = colors.semilightgray },
+        a = { bg = colors.inactive_bg, fg = colors.inactive_fg, gui = "bold" },
+        b = { bg = colors.inactive_bg, fg = colors.inactive_fg },
+        c = { bg = colors.inactive_bg, fg = colors.inactive_fg },
       },
     }
 
