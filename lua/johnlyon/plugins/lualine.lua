@@ -6,15 +6,15 @@ return {
     local lazy_status = require("lazy.status") -- to configure lazy pending updates count
 
     local colors = {
-      orange = "#ff7d00",
-      green = "#42be65",
-      violet = "#be95ff",
-      yellow = "#f1c21b",
-      red = "#fa4d56",
-      fg = "#dde1e6",
-      bg = "#262626",
-      inactive_bg = "#1f1f1f",
-      inactive_fg = "#7b818c",
+      orange = "#CE422B",   -- Rust 品牌色，比原来的 #c45508 更正宗
+      insert = "#E8845A",   -- 亮橙棕，insert mode 清晰可辨
+      violet = "#7A4E3E",   -- 锈紫棕，去掉原来偏粉的倾向
+      yellow = "#C8974A",   -- 铁锈金，暖系关键字色
+      red    = "#A0522D",   -- 赭石红，比原来更接近工业锈色
+      fg     = "#E8DDD4",   -- 暖白（原来 #dde1e6 偏冷蓝）
+      bg     = "#1C0F0A",   -- 焦炭黑偏暖，替代纯品牌色做背景
+      inactive_bg = "#1d1714",  -- 保留
+      inactive_fg = "#7b818c",  -- 保留
     }
 
     local my_lualine_theme = {
@@ -27,7 +27,7 @@ return {
         z = { bg = colors.bg, fg = colors.fg },
       },
       insert = {
-        a = { bg = colors.green, fg = colors.bg, gui = "bold" },
+        a = { bg = colors.insert, fg = colors.bg, gui = "bold" },
         b = { bg = colors.bg, fg = colors.fg },
         c = { bg = colors.bg, fg = colors.fg },
         x = { bg = colors.bg, fg = colors.fg },
