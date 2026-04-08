@@ -3,19 +3,24 @@ return {
   dependencies = { "nvim-tree/nvim-web-devicons" },
   config = function()
     local lualine = require("lualine")
-    local lazy_status = require("lazy.status") -- to configure lazy pending updates count
+    local lazy_status = require("lazy.status")
 
     local colors = {
-      orange = "#CE422B",   -- Rust 品牌色，比原来的 #c45508 更正宗
-      insert = "#E8845A",   -- 亮橙棕，insert mode 清晰可辨
-      violet = "#7A4E3E",   -- 锈紫棕，去掉原来偏粉的倾向
-      yellow = "#C8974A",   -- 铁锈金，暖系关键字色
-      red    = "#A0522D",   -- 赭石红，比原来更接近工业锈色
-      fg     = "#E8DDD4",   -- 暖白（原来 #dde1e6 偏冷蓝）
-      bg     = "#1C0F0A",   -- 焦炭黑偏暖，替代纯品牌色做背景
-      inactive_bg = "#1d1714",  -- 保留
-      inactive_fg = "#7b818c",  -- 保留
+      orange      = "#CE422B",
+      insert      = "#E8845A",
+      violet      = "#7A4E3E",
+      yellow      = "#D4A847",
+      red         = "#A0522D",
+      fg          = "#E8DDD4",
+      bg          = "#1C0F0A",
+      inactive_bg = "#1d1714",
+      inactive_fg = "#7b818c",
+      location_bg = "#3D1F14",
+      location_fg = "#E8DDD4",
     }
+
+    local fixed_z = { bg = colors.location_bg, fg = colors.location_fg, gui = "bold" }
+    local fixed_y = { bg = "#2a1810", fg = colors.yellow }
 
     local my_lualine_theme = {
       normal = {
@@ -23,40 +28,40 @@ return {
         b = { bg = colors.bg, fg = colors.fg },
         c = { bg = colors.bg, fg = colors.fg },
         x = { bg = colors.bg, fg = colors.fg },
-        y = { bg = colors.bg, fg = colors.fg },
-        z = { bg = colors.bg, fg = colors.fg },
+        y = fixed_y,
+        z = fixed_z,
       },
       insert = {
         a = { bg = colors.insert, fg = colors.bg, gui = "bold" },
         b = { bg = colors.bg, fg = colors.fg },
         c = { bg = colors.bg, fg = colors.fg },
         x = { bg = colors.bg, fg = colors.fg },
-        y = { bg = colors.bg, fg = colors.fg },
-        z = { bg = colors.bg, fg = colors.fg },
+        y = fixed_y,
+        z = fixed_z,
       },
       visual = {
-        a = { bg = colors.violet, fg = colors.bg, gui = "bold" },
+        a = { bg = colors.violet, fg = colors.fg, gui = "bold" },
         b = { bg = colors.bg, fg = colors.fg },
         c = { bg = colors.bg, fg = colors.fg },
         x = { bg = colors.bg, fg = colors.fg },
-        y = { bg = colors.bg, fg = colors.fg },
-        z = { bg = colors.bg, fg = colors.fg },
+        y = fixed_y,
+        z = fixed_z,
       },
       command = {
         a = { bg = colors.yellow, fg = colors.bg, gui = "bold" },
         b = { bg = colors.bg, fg = colors.fg },
         c = { bg = colors.bg, fg = colors.fg },
         x = { bg = colors.bg, fg = colors.fg },
-        y = { bg = colors.bg, fg = colors.fg },
-        z = { bg = colors.bg, fg = colors.fg },
+        y = fixed_y,
+        z = fixed_z,
       },
       replace = {
-        a = { bg = colors.red, fg = colors.bg, gui = "bold" },
+        a = { bg = colors.red, fg = colors.fg, gui = "bold" },
         b = { bg = colors.bg, fg = colors.fg },
         c = { bg = colors.bg, fg = colors.fg },
         x = { bg = colors.bg, fg = colors.fg },
-        y = { bg = colors.bg, fg = colors.fg },
-        z = { bg = colors.bg, fg = colors.fg },
+        y = fixed_y,
+        z = fixed_z,
       },
       inactive = {
         a = { bg = colors.inactive_bg, fg = colors.inactive_fg, gui = "bold" },
@@ -68,7 +73,6 @@ return {
       },
     }
 
-    -- configure lualine with modified theme
     lualine.setup({
       options = {
         theme = my_lualine_theme,
@@ -83,6 +87,17 @@ return {
           { "encoding" },
           { "fileformat" },
           { "filetype" },
+        },
+        lualine_y = {
+          {
+            "diagnostics",
+            color = { bg = colors.bg },
+            symbols = { error = "E", warn = "W", info = "I", hint = "H" },
+          },
+          { "progress" },
+        },
+        lualine_z = {
+          { "location" },
         },
       },
     })
