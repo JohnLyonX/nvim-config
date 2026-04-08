@@ -4,7 +4,9 @@ return {
   version = "*",
   opts = {
     options = {
-      mode = "tabs",
+      mode = "buffers",
+      close_command = "bdelete! %d",
+      right_mouse_command = "bdelete! %d",
       separator_style = "slant",
     },
   },

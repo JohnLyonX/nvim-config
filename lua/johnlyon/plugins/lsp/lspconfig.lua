@@ -67,11 +67,22 @@ return {
 			vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
 		end
 
-		-- configure and enable gopls using the new vim.lsp.config API
-		vim.lsp.config("gopls", {
-			capabilities = capabilities,
-			on_attach = on_attach,
-		})
-		vim.lsp.enable("gopls")
+		local servers = {
+			"rust_analyzer",
+			"pyright",
+			"html",
+			"cssls",
+			"ts_ls",
+			"jsonls",
+			"lua_ls",
+		}
+
+		for _, server in ipairs(servers) do
+			vim.lsp.config(server, {
+				capabilities = capabilities,
+				on_attach = on_attach,
+			})
+			vim.lsp.enable(server)
+		end
 	end,
 }

@@ -14,12 +14,12 @@ return {
 
 		mason_null_ls.setup({
 			ensure_installed = {
-				"prettier", -- prettier formatter
 				"stylua", -- lua formatter
 				"black", -- python formatter
+				"isort", -- python import sorter
 				"pylint", -- python linter
 				"eslint_d", -- js linter
-				"gopls", -- golang
+				"prettier", -- web formatter
 			},
 		})
 
@@ -39,13 +39,11 @@ return {
 				--  to disable file types use
 				--  "formatting.prettier.with({disabled_filetypes: {}})" (see null-ls docs)
 				formatting.prettier.with({
-					extra_filetypes = { "svelte" },
-				}), -- js/ts formatter
+				}), -- web formatter
 				formatting.stylua, -- lua formatter
 				formatting.isort,
 				formatting.black,
 				diagnostics.pylint,
-				diagnostics.gopls,
 				diagnostics.eslint_d.with({ -- js/ts linter
 					condition = function(utils)
 						return utils.root_has_file({ ".eslintrc.js", ".eslintrc.cjs" }) -- only enable if root has .eslintrc.js or .eslintrc.cjs
