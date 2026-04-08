@@ -12,8 +12,8 @@ return {
       yellow = "#f1c21b",
       red = "#fa4d56",
       fg = "#dde1e6",
-      bg = "#161616",
-      inactive_bg = "#262626",
+      bg = "#262626",
+      inactive_bg = "#1f1f1f",
       inactive_fg = "#7b818c",
     }
 
@@ -22,31 +22,49 @@ return {
         a = { bg = colors.orange, fg = colors.bg, gui = "bold" },
         b = { bg = colors.bg, fg = colors.fg },
         c = { bg = colors.bg, fg = colors.fg },
+        x = { bg = colors.bg, fg = colors.fg },
+        y = { bg = colors.bg, fg = colors.fg },
+        z = { bg = colors.bg, fg = colors.fg },
       },
       insert = {
         a = { bg = colors.green, fg = colors.bg, gui = "bold" },
         b = { bg = colors.bg, fg = colors.fg },
         c = { bg = colors.bg, fg = colors.fg },
+        x = { bg = colors.bg, fg = colors.fg },
+        y = { bg = colors.bg, fg = colors.fg },
+        z = { bg = colors.bg, fg = colors.fg },
       },
       visual = {
         a = { bg = colors.violet, fg = colors.bg, gui = "bold" },
         b = { bg = colors.bg, fg = colors.fg },
         c = { bg = colors.bg, fg = colors.fg },
+        x = { bg = colors.bg, fg = colors.fg },
+        y = { bg = colors.bg, fg = colors.fg },
+        z = { bg = colors.bg, fg = colors.fg },
       },
       command = {
         a = { bg = colors.yellow, fg = colors.bg, gui = "bold" },
         b = { bg = colors.bg, fg = colors.fg },
         c = { bg = colors.bg, fg = colors.fg },
+        x = { bg = colors.bg, fg = colors.fg },
+        y = { bg = colors.bg, fg = colors.fg },
+        z = { bg = colors.bg, fg = colors.fg },
       },
       replace = {
         a = { bg = colors.red, fg = colors.bg, gui = "bold" },
         b = { bg = colors.bg, fg = colors.fg },
         c = { bg = colors.bg, fg = colors.fg },
+        x = { bg = colors.bg, fg = colors.fg },
+        y = { bg = colors.bg, fg = colors.fg },
+        z = { bg = colors.bg, fg = colors.fg },
       },
       inactive = {
         a = { bg = colors.inactive_bg, fg = colors.inactive_fg, gui = "bold" },
         b = { bg = colors.inactive_bg, fg = colors.inactive_fg },
         c = { bg = colors.inactive_bg, fg = colors.inactive_fg },
+        x = { bg = colors.inactive_bg, fg = colors.inactive_fg },
+        y = { bg = colors.inactive_bg, fg = colors.inactive_fg },
+        z = { bg = colors.inactive_bg, fg = colors.inactive_fg },
       },
     }
 
@@ -68,5 +86,8 @@ return {
         },
       },
     })
+
+    vim.api.nvim_set_hl(0, "StatusLine", { bg = colors.bg, fg = colors.fg })
+    vim.api.nvim_set_hl(0, "StatusLineNC", { bg = colors.inactive_bg, fg = colors.inactive_fg })
   end,
 }
