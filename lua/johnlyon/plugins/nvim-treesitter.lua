@@ -41,6 +41,17 @@ return {
           enable_close_on_slash = false,
         },
       })
+      do
+        local internal = require("nvim-ts-autotag.internal")
+        local rename_tag = internal.rename_tag
+        internal.rename_tag = function()
+          local ok, parser = pcall(vim.treesitter.get_parser)
+          if not ok or parser == nil then
+            return
+          end
+          return rename_tag()
+        end
+      end
 
       local group = vim.api.nvim_create_augroup("johnlyon_treesitter", { clear = true })
       vim.api.nvim_create_autocmd("FileType", {
