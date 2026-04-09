@@ -31,21 +31,21 @@ keymap.set("t", "<C-h>", [[<C-\><C-n><C-w>h]], { desc = "Move to left split from
 keymap.set("t", "<C-j>", [[<C-\><C-n><C-w>j]], { desc = "Move to lower split from terminal" })
 keymap.set("t", "<C-k>", [[<C-\><C-n><C-w>k]], { desc = "Move to upper split from terminal" })
 keymap.set("t", "<C-l>", [[<C-\><C-n><C-w>l]], { desc = "Move to right split from terminal" })
-keymap.set("n", "<leader>svt", function()
+keymap.set("n", "<leader>stv", function()
 	vim.cmd("vsplit | terminal")
 end, { desc = "Split window vertically and open terminal" })
-keymap.set("n", "<leader>sht", function()
+keymap.set("n", "<leader>sth", function()
 	vim.cmd("split | terminal")
 end, { desc = "Split window horizontally and open terminal" })
-keymap.set("n", "<leader>h=", "<cmd>resize +2<CR>", { desc = "Increase window height" })
-keymap.set("n", "<leader>h-", "<cmd>resize -2<CR>", { desc = "Decrease window height" })
-keymap.set("n", "<leader>v=", "<cmd>vertical resize +2<CR>", { desc = "Increase window width" })
-keymap.set("n", "<leader>v-", "<cmd>vertical resize -2<CR>", { desc = "Decrease window width" })
+keymap.set("n", "<leader>wh=", "<cmd>resize +2<CR>", { desc = "Increase window height" })
+keymap.set("n", "<leader>wh-", "<cmd>resize -2<CR>", { desc = "Decrease window height" })
+keymap.set("n", "<leader>wv=", "<cmd>vertical resize +2<CR>", { desc = "Increase window width" })
+keymap.set("n", "<leader>wv-", "<cmd>vertical resize -2<CR>", { desc = "Decrease window width" })
 keymap.set("n", "<leader>se", "<C-w>=", { desc = "Make splits equal size" }) -- make split windows equal width & height
 keymap.set("n", "<leader>sx", "<cmd>close<CR>", { desc = "Close current split" }) -- close current split window
 
 -- open terminal in a bottom split (ctrl-\ ctrl-n to exit terminal mode)
-keymap.set("n", "<leader>st", function()
+keymap.set("n", "<leader>stt", function()
 	vim.cmd("botright 15split | terminal")
 end, { desc = "Open bottom terminal split" })
 
