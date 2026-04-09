@@ -20,11 +20,11 @@ return {
         fg = "#6f6f6f",
       },
       close_button_selected = {
-        bg = "#2a211d",
+        bg = "#434343",
         fg = "#e8ddd4",
       },
       buffer_selected = {
-        bg = "#2a211d",
+        bg = "#434343",
         fg = "#e8ddd4",
         bold = false,
         italic = false,
@@ -38,11 +38,11 @@ return {
         fg = "#7a3e48",
       },
       modified_selected = {
-        bg = "#2a211d",
+        bg = "#434343",
         fg = "#c45508",
       },
       tab_selected = {
-        bg = "#2a211d",
+        bg = "#302a28",
         fg = "#e8ddd4",
       },
       tab_close = {
@@ -54,7 +54,7 @@ return {
         fg = "#1b1b1b",
       },
       separator_selected = {
-        bg = "#2a211d",
+        bg = "#434343",
         fg = "#1b1b1b",
       },
       separator_visible = {
