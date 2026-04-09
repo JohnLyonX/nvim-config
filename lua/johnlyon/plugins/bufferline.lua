@@ -61,6 +61,34 @@ return {
         bg = "#1b1b1b",
         fg = "#1b1b1b",
       },
+       buffer_visible = {
+    bg = "#1b1b1b",
+    fg = "#6f6f6f",
+  },
+  numbers = {
+    bg = "#1b1b1b",
+    fg = "#6f6f6f",
+  },
+  numbers_visible = {
+    bg = "#1b1b1b",
+    fg = "#6f6f6f",
+  },
+  numbers_selected = {
+    bg = "#434343",
+    fg = "#e8ddd4",
+  },
+  duplicate = {
+    bg = "#1b1b1b",
+    fg = "#6f6f6f",
+  },
+  duplicate_visible = {
+    bg = "#1b1b1b",
+    fg = "#6f6f6f",
+  },
+  duplicate_selected = {
+    bg = "#434343",
+    fg = "#e8ddd4",
+  },
     },
     options = {
       mode = "buffers",
