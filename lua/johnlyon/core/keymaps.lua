@@ -37,10 +37,61 @@ end, { desc = "Split window vertically and open terminal" })
 keymap.set("n", "<leader>sth", function()
 	vim.cmd("split | terminal")
 end, { desc = "Split window horizontally and open terminal" })
-keymap.set("n", "<leader>wh=", "<cmd>resize +2<CR>", { desc = "Increase window height" })
-keymap.set("n", "<leader>wh-", "<cmd>resize -2<CR>", { desc = "Decrease window height" })
-keymap.set("n", "<leader>wv=", "<cmd>vertical resize +2<CR>", { desc = "Increase window width" })
-keymap.set("n", "<leader>wv-", "<cmd>vertical resize -2<CR>", { desc = "Decrease window width" })
+local function make_resize_mode(is_height)
+  return function()
+    local inc_cmd = is_height and "resize +2" or "vertical resize +2"
+    local dec_cmd = is_height and "resize -2" or "vertical resize -2"
+    local label = is_height and "HEIGHT" or "WIDTH"
+
+    vim.api.nvim_echo(
+      { { "-- RESIZE " .. label .. " -- (= increase  - decrease  other key: exit)", "MoreMsg" } },
+      false, {}
+    )
+
+    local timed_out = false
+    local timer = vim.uv.new_timer()
+
+    local function reset_timer()
+      timer:stop()
+      timer:start(3000, 0, vim.schedule_wrap(function()
+        timed_out = true
+        vim.fn.feedkeys("\0", "n")
+      end))
+    end
+
+    reset_timer()
+
+    while true do
+      local char = vim.fn.getcharstr()
+      if timed_out or char == "\0" then
+        break
+      elseif char == "=" then
+        vim.cmd(inc_cmd)
+        vim.cmd("redraw")
+        reset_timer()
+      elseif char == "-" then
+        vim.cmd(dec_cmd)
+        vim.cmd("redraw")
+        reset_timer()
+      else
+        timer:stop()
+        timer:close()
+        vim.fn.feedkeys(char, "n")
+        break
+      end
+    end
+
+    if not timer:is_closing() then
+      timer:stop()
+      timer:close()
+    end
+
+    vim.api.nvim_echo({ { "", "Normal" } }, false, {})
+  end
+end
+
+keymap.set("n", "<leader>swh", make_resize_mode(true), { desc = "Resize window height mode" })
+keymap.set("n", "<leader>swv", make_resize_mode(false), { desc = "Resize window width mode" })
 keymap.set("n", "<leader>se", "<C-w>=", { desc = "Make splits equal size" }) -- make split windows equal width & height
 keymap.set("n", "<leader>sx", "<cmd>close<CR>", { desc = "Close current split" }) -- close current split window
 
