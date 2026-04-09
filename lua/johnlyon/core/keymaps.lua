@@ -48,42 +48,18 @@ local function make_resize_mode(is_height)
       false, {}
     )
 
-    local timed_out = false
-    local timer = vim.uv.new_timer()
-
-    local function reset_timer()
-      timer:stop()
-      timer:start(3000, 0, vim.schedule_wrap(function()
-        timed_out = true
-        vim.fn.feedkeys("\0", "n")
-      end))
-    end
-
-    reset_timer()
-
     while true do
       local char = vim.fn.getcharstr()
-      if timed_out or char == "\0" then
-        break
-      elseif char == "=" then
+      if char == "=" then
         vim.cmd(inc_cmd)
         vim.cmd("redraw")
-        reset_timer()
       elseif char == "-" then
         vim.cmd(dec_cmd)
         vim.cmd("redraw")
-        reset_timer()
       else
-        timer:stop()
-        timer:close()
         vim.fn.feedkeys(char, "n")
         break
       end
-    end
-
-    if not timer:is_closing() then
-      timer:stop()
-      timer:close()
     end
 
     vim.api.nvim_echo({ { "", "Normal" } }, false, {})
