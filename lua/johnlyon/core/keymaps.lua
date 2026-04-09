@@ -23,10 +23,6 @@ keymap.set("n", "<leader>-", "<C-x>", { desc = "Decrement number" }) -- decremen
 -- window management
 keymap.set("n", "<leader>sv", "<c-w>v", { desc = "Split window vertically" }) -- split window vertically
 keymap.set("n", "<leader>sh", "<C-w>s", { desc = "Split window horizontally" }) -- split window horizontally
-keymap.set("n", "<C-h>", "<C-w>h", { desc = "Move to left split" })
-keymap.set("n", "<C-j>", "<C-w>j", { desc = "Move to lower split" })
-keymap.set("n", "<C-k>", "<C-w>k", { desc = "Move to upper split" })
-keymap.set("n", "<C-l>", "<C-w>l", { desc = "Move to right split" })
 keymap.set("t", "<C-h>", [[<C-\><C-n><C-w>h]], { desc = "Move to left split from terminal" })
 keymap.set("t", "<C-j>", [[<C-\><C-n><C-w>j]], { desc = "Move to lower split from terminal" })
 keymap.set("t", "<C-k>", [[<C-\><C-n><C-w>k]], { desc = "Move to upper split from terminal" })
