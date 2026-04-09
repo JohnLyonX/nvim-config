@@ -85,3 +85,7 @@ keymap.set("n", "<leader>tf", "<cmd>tabnew %<CR>", { desc = "Open current buffer
 -- first and last
 keymap.set("n", "<leader>p", "$")
 keymap.set("n", "<leader>q", "0")
+
+-- gs: go to line start, gl: go to line end
+keymap.set({ "n", "v" }, "gs", "^", { desc = "Go to first non-blank character of line" })
+keymap.set({ "n", "v" }, "gl", "$", { desc = "Go to end of line" })

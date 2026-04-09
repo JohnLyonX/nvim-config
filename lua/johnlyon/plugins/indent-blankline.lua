@@ -32,7 +32,7 @@ return {
 					highlight = highlight,
 				},
 				scope = {
-					enabled = true,
+					enabled = false,
 				},
 				exclude = {
 					filetypes = {

@@ -43,14 +43,17 @@ return {
       })
       do
         local internal = require("nvim-ts-autotag.internal")
-        local rename_tag = internal.rename_tag
-        internal.rename_tag = function()
-          local ok, parser = pcall(vim.treesitter.get_parser)
-          if not ok or parser == nil then
-            return
+        local function wrap_with_parser_check(fn)
+          return function(...)
+            local ok, parser = pcall(vim.treesitter.get_parser)
+            if not ok or parser == nil then
+              return
+            end
+            return fn(...)
           end
-          return rename_tag()
         end
+        internal.rename_tag = wrap_with_parser_check(internal.rename_tag)
+        internal.close_tag = wrap_with_parser_check(internal.close_tag)
       end
 
       local group = vim.api.nvim_create_augroup("johnlyon_treesitter", { clear = true })
