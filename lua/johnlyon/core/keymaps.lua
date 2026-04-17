@@ -78,6 +78,12 @@ keymap.set("n", "<leader>tn", "<cmd>tabn<CR>", { desc = "Go to next tab" }) --  
 keymap.set("n", "<leader>tp", "<cmd>tabp<CR>", { desc = "Go to previous tab" }) --  go to previous tab
 keymap.set("n", "<leader>tf", "<cmd>tabnew %<CR>", { desc = "Open current buffer in new tab" }) --  move current buffer to new tab
 
+-- buffer management
+keymap.set("n", "H", "<cmd>bprevious<CR>", { desc = "Go to previous buffer" })
+keymap.set("n", "L", "<cmd>bnext<CR>", { desc = "Go to next buffer" })
+keymap.set("n", "<leader>bx", "<cmd>bdelete!<CR>", { desc = "Close current buffer" })
+keymap.set("n", "<leader>box", "<cmd>%bd|e#|bd#<CR>", { desc = "Close all buffers except current" })
+
 -- first and last
 keymap.set("n", "<leader>p", "$")
 keymap.set("n", "<leader>q", "0")
