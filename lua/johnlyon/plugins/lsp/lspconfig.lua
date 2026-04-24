@@ -51,7 +51,7 @@ return {
 
 			opts.desc = "Show documentation for what is under cursor"
 			keymap.set("n", "K", function()
-				require("johnlyon.core.lsp_hover").show({ max_width = 80, max_height = 20 })
+				require("johnlyon.core.lsp_hover").show({ max_width = 70, max_height = 15 })
 			end, opts)
 
 			opts.desc = "Restart LSP"

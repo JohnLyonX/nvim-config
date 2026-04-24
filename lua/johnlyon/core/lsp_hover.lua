@@ -14,11 +14,11 @@ end
 
 function M.show(opts)
 	opts = opts or {}
-	local max_width = math.min(opts.max_width or 80, math.floor(vim.o.columns * 0.8))
-	local max_height = math.min(opts.max_height or 20, math.floor(vim.o.lines * 0.5))
+	local max_width = 50
+	local max_height = 15
 
 	vim.lsp.buf.hover({
-		border = "none",
+		border = "rounded",
 		max_width = max_width,
 		max_height = max_height,
 	})
@@ -35,18 +35,48 @@ function M.show(opts)
 			if hover_win then
 				timer:stop()
 				timer:close()
+
+				local function cleanup()
+					pcall(vim.keymap.del, "n", "q", { buffer = src_buf })
+					pcall(vim.keymap.del, "n", "<C-d>", { buffer = src_buf })
+					pcall(vim.keymap.del, "n", "<C-u>", { buffer = src_buf })
+				end
+
 				vim.keymap.set("n", "q", function()
 					if vim.api.nvim_win_is_valid(hover_win) then
 						pcall(vim.api.nvim_win_close, hover_win, true)
 					end
-					pcall(vim.keymap.del, "n", "q", { buffer = src_buf })
+					cleanup()
 				end, { buffer = src_buf, nowait = true, silent = true, desc = "Close LSP hover" })
+
+				local function scroll(keys)
+					return function()
+						if vim.api.nvim_win_is_valid(hover_win) then
+							vim.api.nvim_win_call(hover_win, function()
+								vim.cmd("normal! " .. keys)
+							end)
+						end
+					end
+				end
+
+				-- \x04 = ^D, \x15 = ^U
+				vim.keymap.set("n", "<C-d>", scroll("\x04"), {
+					buffer = src_buf,
+					nowait = true,
+					silent = true,
+					desc = "Scroll hover down",
+				})
+				vim.keymap.set("n", "<C-u>", scroll("\x15"), {
+					buffer = src_buf,
+					nowait = true,
+					silent = true,
+					desc = "Scroll hover up",
+				})
+
 				vim.api.nvim_create_autocmd("WinClosed", {
 					pattern = tostring(hover_win),
 					once = true,
-					callback = function()
-						pcall(vim.keymap.del, "n", "q", { buffer = src_buf })
-					end,
+					callback = cleanup,
 				})
 			elseif attempts >= 30 then
 				timer:stop()

@@ -70,7 +70,7 @@ return {
 
 				opts.desc = "Show documentation for what is under cursor"
 				keymap.set("n", "K", function()
-					require("johnlyon.core.lsp_hover").show({ max_width = 100, max_height = 30 })
+					require("johnlyon.core.lsp_hover").show({ max_width = 80, max_height = 18 })
 				end, opts)
 
 				opts.desc = "Rust hover actions (go to trait/impl)"
