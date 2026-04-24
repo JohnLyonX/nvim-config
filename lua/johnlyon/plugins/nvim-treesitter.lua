@@ -20,6 +20,7 @@ return {
         "prisma",
         "markdown",
         "markdown_inline",
+        "rust",
         "svelte",
         "graphql",
         "bash",

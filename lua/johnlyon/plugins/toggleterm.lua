@@ -1,6 +1,8 @@
 return {
   "akinsho/toggleterm.nvim",
   version = "*",
+  cmd = { "ToggleTerm", "TermExec" },
+  keys = { { "<leader>t", desc = "Toggle terminal" } },
   config = function()
     local toggleterm = require("toggleterm")
 

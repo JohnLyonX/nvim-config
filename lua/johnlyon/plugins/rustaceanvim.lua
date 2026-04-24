@@ -12,7 +12,27 @@ return {
 
 			local capabilities = cmp_nvim_lsp.default_capabilities()
 
-			local on_attach = function(_, bufnr)
+			local on_attach = function(client, bufnr)
+				-- 清理 rust-analyzer hover 响应里的 HTML 标签，修复 Lspsaga hover_doc 渲染
+				local original_request = client.request
+				client.request = function(method, params, handler, req_bufnr)
+					if method == "textDocument/hover" then
+						return original_request(method, params, function(err, result, ctx, config)
+							if result and result.contents and result.contents.value then
+								local v = result.contents.value
+								v = v:gsub("\\<", "\1"):gsub("\\>", "\2")
+								v = v:gsub("<[^>]+>", "")
+								v = v:gsub("\1", "<"):gsub("\2", ">")
+								result.contents.value = v
+							end
+							if handler then
+								handler(err, result, ctx, config)
+							end
+						end, req_bufnr)
+					end
+					return original_request(method, params, handler, req_bufnr)
+				end
+
 				local opts = { noremap = true, silent = true, buffer = bufnr }
 
 				opts.desc = "Show LSP references"
@@ -49,7 +69,10 @@ return {
 				keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
 
 				opts.desc = "Show documentation for what is under cursor"
-				keymap.set("n", "K", function()
+				keymap.set("n", "K", "<cmd>Lspsaga hover_doc<CR>", opts)
+
+				opts.desc = "Rust hover actions (go to trait/impl)"
+				keymap.set("n", "<leader>ha", function()
 					vim.cmd.RustLsp({ "hover", "actions" })
 				end, opts)
 
@@ -58,6 +81,13 @@ return {
 			end
 
 			vim.g.rustaceanvim = {
+				tools = {
+					float_win_config = {
+						border = "rounded",
+						max_width = 100,
+						max_height = 30,
+					},
+				},
 				server = {
 					capabilities = capabilities,
 					on_attach = on_attach,

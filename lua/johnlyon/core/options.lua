@@ -31,8 +31,10 @@ opt.signcolumn = "yes" -- show sign column so that text doesn't shift
 -- backspace
 opt.backspace = "indent,eol,start" -- allow backspace on indent, end of line or insert mode start position
 
--- clipboard
-opt.clipboard:append("unnamedplus") -- use system clipboard as default register
+-- clipboard (deferred to avoid macOS pbcopy detection cost at startup)
+vim.schedule(function()
+  opt.clipboard:append("unnamedplus")
+end)
 
 -- split windows
 opt.splitright = true -- split vertical window to the right
@@ -40,3 +42,21 @@ opt.splitbelow = true -- split horizontal window to the bottom
 
 -- turn off swapfile
 opt.swapfile = false
+
+-- 内置终端打开后立即进入 insert 模式，避免 normal 模式误吞按键
+vim.api.nvim_create_autocmd("TermOpen", {
+  group = vim.api.nvim_create_augroup("johnlyon_term", { clear = true }),
+  callback = function()
+    vim.opt_local.number = false
+    vim.opt_local.relativenumber = false
+    vim.opt_local.signcolumn = "no"
+    vim.cmd("startinsert")
+  end,
+})
+
+-- 切回已有终端 buffer 时也自动进 insert
+vim.api.nvim_create_autocmd("BufEnter", {
+  group = "johnlyon_term",
+  pattern = "term://*",
+  command = "startinsert",
+})

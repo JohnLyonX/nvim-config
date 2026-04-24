@@ -16,10 +16,23 @@ require("lazy").setup({ { import = "johnlyon.plugins" }, { import = "johnlyon.pl
 		colorscheme = { "oxocarbon" },
 	},
 	checker = {
-		enabled = true,
-		notify = false,
+		enabled = false,
 	},
 	change_detection = {
-		notify = false,
+		enabled = false,
+	},
+	performance = {
+		rtp = {
+			disabled_plugins = {
+				"gzip",
+				"matchit",
+				"matchparen",
+				"netrwPlugin",
+				"tarPlugin",
+				"tohtml",
+				"tutor",
+				"zipPlugin",
+			},
+		},
 	},
 })

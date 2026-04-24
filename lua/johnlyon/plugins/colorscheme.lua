@@ -5,6 +5,10 @@ return {
 		config = function()
 			vim.opt.background = "dark"
 			vim.cmd.colorscheme("oxocarbon")
+			-- 让 nvim 内置终端继承系统终端（iTerm2）的 ANSI 色板
+			for i = 0, 15 do
+				vim.g["terminal_color_" .. i] = nil
+			end
 		end,
 	},
   -- {

@@ -91,3 +91,6 @@ keymap.set("n", "<leader>q", "0")
 -- gs: go to line start, gl: go to line end
 keymap.set({ "n", "v" }, "gs", "^", { desc = "Go to first non-blank character of line" })
 keymap.set({ "n", "v" }, "gl", "$", { desc = "Go to end of line" })
+
+-- ge: go to end of file (pairs with gg: go to start of file)
+keymap.set({ "n", "v" }, "ge", "G", { desc = "Go to end of file" })
