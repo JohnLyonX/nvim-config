@@ -60,5 +60,29 @@ return {
     keymap.set("n", "<leader>ef", "<cmd>NvimTreeFindFileToggle<CR>", { desc = "Toggle file explorer on current file" }) -- toggle file explorer on current file
     keymap.set("n", "<leader>ec", "<cmd>NvimTreeCollapse<CR>", { desc = "Collapse file explorer" }) -- collapse file explorer
     keymap.set("n", "<leader>er", "<cmd>NvimTreeRefresh<CR>", { desc = "Refresh file explorer" }) -- refresh file explorer
+
+    -- 当 nvim-tree 是最后一个窗口时自动退出 Neovim
+    -- 这样 :q 关掉最后一个文件 buffer 后会直接退出，而不是停留在 tree 界面
+    vim.api.nvim_create_autocmd("QuitPre", {
+      callback = function()
+        local tree_wins = {}
+        local floating_wins = {}
+        local wins = vim.api.nvim_list_wins()
+        for _, w in ipairs(wins) do
+          local bufname = vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(w))
+          if bufname:match("NvimTree_") ~= nil then
+            table.insert(tree_wins, w)
+          end
+          if vim.api.nvim_win_get_config(w).relative ~= "" then
+            table.insert(floating_wins, w)
+          end
+        end
+        if 1 == #wins - #floating_wins - #tree_wins then
+          for _, w in ipairs(tree_wins) do
+            vim.api.nvim_win_close(w, true)
+          end
+        end
+      end,
+    })
   end,
 }

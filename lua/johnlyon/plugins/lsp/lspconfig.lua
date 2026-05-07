@@ -50,9 +50,7 @@ return {
 			keymap.set("n", "]d", vim.diagnostic.goto_next, opts) -- jump to next diagnostic in buffer
 
 			opts.desc = "Show documentation for what is under cursor"
-			keymap.set("n", "K", function()
-				require("johnlyon.core.lsp_hover").show({ max_width = 70, max_height = 15 })
-			end, opts)
+			keymap.set("n", "K", "<cmd>Lspsaga hover_doc<CR>", opts)
 
 			opts.desc = "Restart LSP"
 			keymap.set("n", "<leader>rs", ":LspRestart<CR>", opts) -- mapping to restart lsp if necessary
@@ -76,6 +74,7 @@ return {
 			"ts_ls",
 			"jsonls",
 			"lua_ls",
+			"zls",
 		}
 
 		for _, server in ipairs(servers) do

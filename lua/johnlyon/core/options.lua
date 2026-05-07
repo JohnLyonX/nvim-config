@@ -43,6 +43,13 @@ opt.splitbelow = true -- split horizontal window to the bottom
 -- turn off swapfile
 opt.swapfile = false
 
+-- 隐藏底部命令行区域（cmdline 由 noice.nvim 接管，浮动窗口显示）
+opt.cmdheight = 0
+
+-- 禁止鼠标拖拽 statusline / 窗口分隔条改变窗口大小
+-- 保留点击与滚轮，仅屏蔽 LeftDrag（这是 Neovim 改窗口尺寸的内建行为）
+vim.keymap.set({ "n", "i", "v", "c", "t" }, "<LeftDrag>", "<LeftMouse>", { silent = true })
+
 -- 内置终端打开后立即进入 insert 模式，避免 normal 模式误吞按键
 vim.api.nvim_create_autocmd("TermOpen", {
   group = vim.api.nvim_create_augroup("johnlyon_term", { clear = true }),

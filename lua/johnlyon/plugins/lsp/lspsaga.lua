@@ -26,5 +26,36 @@ return {
         enable = false,
       },
     })
+
+    -- 智能滚动：若 lspsaga hover 浮窗存在则滚动它，否则走默认翻页
+    local function find_hover_win()
+      for _, win in ipairs(vim.api.nvim_list_wins()) do
+        local cfg = vim.api.nvim_win_get_config(win)
+        if cfg.relative ~= "" and cfg.relative ~= nil and cfg.relative ~= "" then
+          local buf = vim.api.nvim_win_get_buf(win)
+          local ft = vim.bo[buf].filetype
+          if ft == "sagahover" or ft == "markdown" then
+            return win
+          end
+        end
+      end
+    end
+
+    local function smart_scroll(keys, fallback)
+      return function()
+        local win = find_hover_win()
+        if win then
+          vim.api.nvim_win_call(win, function()
+            vim.cmd("normal! " .. keys)
+          end)
+        else
+          vim.cmd("normal! " .. fallback)
+        end
+      end
+    end
+
+    -- \x06 = ^F, \x02 = ^B, \x04 = ^D, \x15 = ^U
+    vim.keymap.set("n", "<C-f>", smart_scroll("\x04", "\x06"), { desc = "Scroll hover / page down" })
+    vim.keymap.set("n", "<C-b>", smart_scroll("\x15", "\x02"), { desc = "Scroll hover / page up" })
   end,
 }

@@ -29,6 +29,7 @@ return {
         "dockerfile",
         "gitignore",
         "query",
+        "zig",
       }
 
       require("nvim-treesitter").setup({

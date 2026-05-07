@@ -45,6 +45,7 @@ return {
 			"ts_ls",
 			"jsonls",
 			"lua_ls",
+			"zls",
 		}
 
 		local mason_packages = {
@@ -54,6 +55,7 @@ return {
 			"typescript-language-server",
 			"json-lsp",
 			"lua-language-server",
+			"zls",
 			"stylua",
 			"black",
 			"isort",

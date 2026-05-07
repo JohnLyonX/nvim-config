@@ -1,0 +1,9 @@
+# Claude Code worktrees（隔离修改用，不应被主仓库追踪）
+.claude/worktrees/
+
+# Neovim 运行时产物
+nvim.log
+.DS_Store
+
+# lazy.nvim 的 lock 文件按需保留——如果想锁定插件版本就追踪它，不锁定就忽略
+# lazy-lock.json

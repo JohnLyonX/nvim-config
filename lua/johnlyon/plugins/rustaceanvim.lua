@@ -69,9 +69,7 @@ return {
 				keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
 
 				opts.desc = "Show documentation for what is under cursor"
-				keymap.set("n", "K", function()
-					require("johnlyon.core.lsp_hover").show({ max_width = 80, max_height = 18 })
-				end, opts)
+				keymap.set("n", "K", "<cmd>Lspsaga hover_doc<CR>", opts)
 
 				opts.desc = "Rust hover actions (go to trait/impl)"
 				keymap.set("n", "<leader>ha", function()
