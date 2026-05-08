@@ -95,5 +95,8 @@ keymap.set({ "n", "v" }, "gl", "$", { desc = "Go to end of line" })
 -- ge: go to end of file (pairs with gg: go to start of file)
 keymap.set({ "n", "v" }, "ge", "G", { desc = "Go to end of file" })
 
+-- select all (line-wise visual)
+keymap.set("n", "<C-a>", "ggVG", { desc = "Select all (line-wise)" })
+
 -- disable <C-k> digraph in insert mode (误触避免插入 ^K)
 keymap.set("i", "<C-k>", "<Nop>", { desc = "Disable Ctrl+K digraph" })

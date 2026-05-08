@@ -15,6 +15,18 @@ return {
 		local on_attach = function(client, bufnr)
 			opts.buffer = bufnr
 
+			-- 启用 inlay hints (类型/参数行内提示) — 需要 nvim 0.10+
+			if client:supports_method("textDocument/inlayHint") then
+				pcall(vim.lsp.inlay_hint.enable, true, { bufnr = bufnr })
+			end
+
+			-- toggle inlay hints
+			opts.desc = "Toggle inlay hints"
+			keymap.set("n", "<leader>ih", function()
+				local enabled = vim.lsp.inlay_hint.is_enabled({ bufnr = 0 })
+				vim.lsp.inlay_hint.enable(not enabled, { bufnr = 0 })
+			end, opts)
+
 			-- set keybinds
 			opts.desc = "Show LSP references"
 			keymap.set("n", "gR", "<cmd>FzfLua lsp_references<CR>", opts) -- show definition, references
@@ -67,6 +79,23 @@ return {
 			vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
 		end
 
+		local server_settings = {
+			zls = {
+				enable_inlay_hints = true,
+				inlay_hints_show_variable_type_hints = true,
+				inlay_hints_show_parameter_name = true,
+				inlay_hints_show_builtin = true,
+				inlay_hints_exclude_single_argument = true,
+				inlay_hints_hide_redundant_param_names = true,
+				inlay_hints_hide_redundant_param_names_last_token = true,
+			},
+			lua_ls = {
+				Lua = {
+					hint = { enable = true, arrayIndex = "Disable", setType = true },
+				},
+			},
+		}
+
 		local servers = {
 			"pyright",
 			"html",
@@ -81,6 +110,7 @@ return {
 			vim.lsp.config(server, {
 				capabilities = capabilities,
 				on_attach = on_attach,
+				settings = server_settings[server],
 			})
 			vim.lsp.enable(server)
 		end

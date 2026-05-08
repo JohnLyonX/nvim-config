@@ -13,6 +13,17 @@ return {
 			local capabilities = cmp_nvim_lsp.default_capabilities()
 
 			local on_attach = function(client, bufnr)
+				-- 启用 inlay hints
+				if client:supports_method("textDocument/inlayHint") then
+					pcall(vim.lsp.inlay_hint.enable, true, { bufnr = bufnr })
+				end
+
+				-- toggle inlay hints
+				keymap.set("n", "<leader>ih", function()
+					local enabled = vim.lsp.inlay_hint.is_enabled({ bufnr = 0 })
+					vim.lsp.inlay_hint.enable(not enabled, { bufnr = 0 })
+				end, { buffer = bufnr, desc = "Toggle inlay hints" })
+
 				-- 清理 rust-analyzer hover 响应里的 HTML 标签，修复 Lspsaga hover_doc 渲染
 				local original_request = client.request
 				client.request = function(method, params, handler, req_bufnr)
@@ -91,6 +102,26 @@ return {
 				server = {
 					capabilities = capabilities,
 					on_attach = on_attach,
+					default_settings = {
+						["rust-analyzer"] = {
+							inlayHints = {
+								bindingModeHints = { enable = false },
+								chainingHints = { enable = true },
+								closingBraceHints = { enable = true, minLines = 25 },
+								closureReturnTypeHints = { enable = "never" },
+								lifetimeElisionHints = { enable = "never", useParameterNames = false },
+								maxLength = 25,
+								parameterHints = { enable = true },
+								reborrowHints = { enable = "never" },
+								renderColons = true,
+								typeHints = {
+									enable = true,
+									hideClosureInitialization = false,
+									hideNamedConstructor = false,
+								},
+							},
+						},
+					},
 				},
 			}
 		end,
