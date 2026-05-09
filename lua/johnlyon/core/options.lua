@@ -69,47 +69,72 @@ vim.api.nvim_create_autocmd("BufEnter", {
 })
 
 -- ─────────────────────────────────────────────────────────────────────────────
--- nvim 0.12 LSP pull diagnostics 的 TOCTOU 竞态修补
+-- nvim 0.12 LSP pull diagnostics 的竞态修补
 -- ─────────────────────────────────────────────────────────────────────────────
--- 现象:rust-analyzer / 其他 LSP 在分析过程中,如果 buffer 被 wipe(关 buffer、
--- 退出 nvim、:%bd 等),稍后到达的 textDocument/diagnostic 响应会触发:
+-- 现象:打开 Rust 项目同时快速 <leader>t 唤出 toggleterm 浮动终端时,nvim 报红:
 --
---   diagnostic.lua:296: attempt to index local 'bufstate' (a nil value)
+--   …/lsp/diagnostic.lua:296: attempt to index local 'bufstate' (a nil value)
 --
--- 原因:_refresh() 发出 LSP 请求 → 几百 ms 内 buffer 被 wipe →
--- on_detach autocmd 清掉 bufstates[bufnr] → 响应抵达 on_diagnostic →
--- 上游函数没做 nil 检查就 bufstate.client_result_id[key] = ... → 崩
+-- 真正的根因(读 v0.12.2 实际源码定位):
+--   - rust-analyzer 通过 client/registerCapability 动态注册
+--     textDocument/diagnostic(handlers.lua:147-176)。注册后立即对
+--     attached_buffers 调 _refresh 发请求。
+--   - _refresh 不会自己初始化 bufstates[bufnr],该初始化由 _set_defaults →
+--     diagnostic._enable(bufnr) 完成(lsp.lua:865-867)。
+--   - 启动期快速打开 toggleterm float 时,autocmd 排序 / 当前 buf 切换之间
+--     存在 race,偶发出现:_refresh 已发出请求 → 响应到达 → on_diagnostic 跑
+--     → bufstates[bufnr] 仍是 nil → diagnostic.lua:292 取出 nil →
+--     diagnostic.lua:296 索引崩。
 --
--- 该 bug 在 v0.12.2 / master 都未修(GitHub 全站搜不到对应 issue)。
--- 我们包一层,在 buffer 已死时直接丢弃响应,这本来就是正确处理方式。
+-- 此前的"buffer 已 wipe"假设是错的:这一场景下 buffer 仍然有效,只是
+-- 模块私有的 bufstates 表里没那个 entry。所以 nvim_buf_is_valid 守卫拦不住。
+--
+-- 修法:在 wrapper 里通过 debug.getupvalue 拿出 diagnostic.lua 模块私有的
+-- bufstates 表;若 bufstates[bufnr] 缺失就替 _enable 把 entry 补上,再调原
+-- 函数。upvalue 抓不到时 pcall 兜底,功能不挂。
 --
 -- 上游修复后可整段删除。参考源码:
---   https://github.com/neovim/neovim/blob/v0.12.2/runtime/lua/vim/lsp/diagnostic.lua#L296
+--   /opt/homebrew/Cellar/neovim/0.12.2/share/nvim/runtime/lua/vim/lsp/diagnostic.lua:276-319
 -- ─────────────────────────────────────────────────────────────────────────────
 
 -- 层 1:覆写 on_diagnostic（处理 textDocument/diagnostic 响应,主战场）
--- 用 pcall 整个包住原函数:不仅 buffer wipe 这一种 race,只要任何路径让
--- bufstate 提前变 nil(LspDetach、LSP 断开重连、workspace 与 document 模式切换
--- 等),都会被静默吞掉。其它非这个 bug 的错误会重新抛出,不影响调试。
 do
   local diag = vim.lsp.diagnostic
   local original = diag.on_diagnostic
+
+  -- 抓 diagnostic.lua 模块的私有 bufstates 表(原函数的 upvalue)
+  local bufstates
+  for i = 1, math.huge do
+    local n, v = debug.getupvalue(original, i)
+    if not n then break end
+    if n == "bufstates" then
+      bufstates = v
+      break
+    end
+  end
+
   diag.on_diagnostic = function(err, result, ctx)
-    -- 第一道防线:buffer 已无效直接丢弃,连 pcall 都省了
     if not ctx or not ctx.bufnr or not vim.api.nvim_buf_is_valid(ctx.bufnr) then
       return
     end
-    -- 第二道防线:用 pcall 兜住"bufstate 为 nil"这类边缘 race
-    local ok, lua_err = pcall(original, err, result, ctx)
-    if ok then return end
-    -- 只吞掉已知的 bufstate nil 错误,其它真正的错误重新抛出
-    if type(lua_err) == "string"
-        and (lua_err:match("bufstate")
-          or lua_err:match("client_result_id")
-          or lua_err:match("attempt to index local")) then
-      return
+
+    -- 关键修复:_enable 没赶上时替它把 bufstate 占位补齐,
+    -- 让原函数后续 bufstate.client_result_id[key] = … 不再崩。
+    -- pull_kind 用 'document',与 _enable 默认值一致。
+    if bufstates and not bufstates[ctx.bufnr] then
+      bufstates[ctx.bufnr] = { pull_kind = "document", client_result_id = {} }
     end
-    error(lua_err)
+
+    -- pcall 兜底:upvalue 抓不到 / 上游字段又改 / 其它意外都不再刷红。
+    local ok, perr = pcall(original, err, result, ctx)
+    if not ok then
+      vim.schedule(function()
+        vim.notify(
+          "[lsp.diagnostic patch] on_diagnostic swallowed: " .. tostring(perr),
+          vim.log.levels.DEBUG
+        )
+      end)
+    end
   end
 end
 
@@ -121,7 +146,6 @@ do
     if not ctx or not ctx.client_id then
       return vim.NIL
     end
-    local ok = pcall(original, err, result, ctx)
-    if not ok then return vim.NIL end
+    return original(err, result, ctx)
   end
 end
