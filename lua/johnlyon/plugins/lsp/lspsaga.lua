@@ -27,15 +27,25 @@ return {
       },
     })
 
-    -- 智能滚动：若 lspsaga hover 浮窗存在则滚动它，否则走默认翻页
+    -- 智能滚动：若 hover / 诊断 浮窗存在则滚动它，否则走默认翻页
+    -- 涵盖：
+    --   - lspsaga hover (ft = sagahover / markdown)
+    --   - vim.diagnostic.open_float （ft = "" + buftype = nofile，诊断浮窗）
+    --   - 其他 LSP info 类浮窗（lspinfo）
+    -- 排除当前窗口本身（避免 floating 编辑器自己滚自己）
     local function find_hover_win()
+      local cur = vim.api.nvim_get_current_win()
       for _, win in ipairs(vim.api.nvim_list_wins()) do
-        local cfg = vim.api.nvim_win_get_config(win)
-        if cfg.relative ~= "" and cfg.relative ~= nil and cfg.relative ~= "" then
-          local buf = vim.api.nvim_win_get_buf(win)
-          local ft = vim.bo[buf].filetype
-          if ft == "sagahover" or ft == "markdown" then
-            return win
+        if win ~= cur then
+          local cfg = vim.api.nvim_win_get_config(win)
+          if cfg.relative ~= nil and cfg.relative ~= "" then
+            local buf = vim.api.nvim_win_get_buf(win)
+            local ft = vim.bo[buf].filetype
+            local bt = vim.bo[buf].buftype
+            if ft == "sagahover" or ft == "markdown" or ft == "lspinfo"
+               or (ft == "" and bt == "nofile") then
+              return win
+            end
           end
         end
       end

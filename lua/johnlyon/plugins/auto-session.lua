@@ -31,16 +31,23 @@ return {
           end
           -- vim 只持久化「大写开头 + 含小写字母 + String/Number」的 vim.g 变量
           vim.g.HadBottomTerm = had_bottom and 1 or 0
+
+          -- 清掉无意义的孤儿 globals，避免污染 session 文件：
+          --   NvimTreeSetup / NvimTreeRequired 是 nvim-tree 内部 marker，每次启动会重置
+          --   HadClaudeCode 是已删除插件留下的旧标记
+          vim.g.NvimTreeSetup = nil
+          vim.g.NvimTreeRequired = nil
+          vim.g.HadClaudeCode = nil
         end,
       },
 
       -- 恢复后：
       --   1) 兜底清掉残留的终端 buffer
-      --   2) 对每个文件 buffer 重新 fire 一次 FileType 自动命令 —— 这会让所有
-      --      挂在 FileType 上的处理器都重跑：treesitter（语法高亮）、
-      --      rustaceanvim/lspconfig（LSP 接管，语义高亮 + 诊断）、indent 等
-      --   3) 上次开着的底部终端，恢复后开新的回来
-      -- 用 vim.schedule 推迟一拍，等 session 把所有 buffer / window 都铺好
+      --   2) 对每个文件 buffer 重新 fire FileType —— treesitter / LSP 都借此挂载
+      --   3) 打开 nvim-tree（alpha 那边的 VimEnter 已经被守卫绕过，layout 由这里统一负责）
+      --   4) 上次开着的底部终端，恢复后开新的回来
+      -- 顺序固定避免和 alpha 的 schedule race（race 会造成右栏多一个孤儿编辑器列）。
+      -- 用 vim.schedule 推迟一拍，等 session 把所有 buffer / window 都铺好。
       post_restore_cmds = {
         function()
           vim.schedule(function()
@@ -67,6 +74,11 @@ return {
                 end
               end
             end
+
+            -- 接管 alpha 让出来的 layout 责任：开 tree
+            pcall(function()
+              require("nvim-tree.api").tree.open({ focus = false })
+            end)
 
             if vim.g.HadBottomTerm == 1 then
               pcall(vim.cmd, "BottomTermToggle")

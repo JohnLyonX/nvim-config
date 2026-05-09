@@ -37,6 +37,12 @@ return {
 			opts.desc = "Show LSP definitions"
 			keymap.set("n", "gd", "<cmd>FzfLua lsp_definitions<CR>", opts) -- show lsp definitions
 
+			opts.desc = "Go to definition (LSP, replaces default gf)"
+			-- 默认 gf 是按 <cfile> 当文件路径打开 —— 在 rust/python/ts 这种用模块路径的语言里
+			-- 经常会误开成 cwd 下的同名目录（exercises/ solutions/ 等）。
+			-- 改成走 LSP definition 直接跳源码定义。
+			keymap.set("n", "gf", vim.lsp.buf.definition, opts)
+
 			opts.desc = "Show LSP implementations"
 			keymap.set("n", "gi", "<cmd>FzfLua lsp_implementations<CR>", opts) -- show lsp implementations
 
@@ -62,7 +68,7 @@ return {
 			keymap.set("n", "]d", vim.diagnostic.goto_next, opts) -- jump to next diagnostic in buffer
 
 			opts.desc = "Show documentation for what is under cursor"
-			keymap.set("n", "K", "<cmd>Lspsaga hover_doc<CR>", opts)
+			keymap.set("n", "<leader>k", "<cmd>Lspsaga hover_doc<CR>", opts)
 
 			opts.desc = "Restart LSP"
 			keymap.set("n", "<leader>rs", ":LspRestart<CR>", opts) -- mapping to restart lsp if necessary

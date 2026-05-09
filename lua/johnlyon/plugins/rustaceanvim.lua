@@ -55,6 +55,11 @@ return {
 				opts.desc = "Show LSP definitions"
 				keymap.set("n", "gd", "<cmd>Telescope lsp_definitions<CR>", opts)
 
+				opts.desc = "Go to definition (LSP, replaces default gf)"
+				-- 默认 gf 在 rust 里经常误开成 cwd 下的同名目录（exercises / solutions 等）。
+				-- 改成走 LSP definition 直接跳源码定义。
+				keymap.set("n", "gf", vim.lsp.buf.definition, opts)
+
 				opts.desc = "Show LSP implementations"
 				keymap.set("n", "gi", "<cmd>Telescope lsp_implementations<CR>", opts)
 
@@ -80,7 +85,7 @@ return {
 				keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
 
 				opts.desc = "Show documentation for what is under cursor"
-				keymap.set("n", "K", "<cmd>Lspsaga hover_doc<CR>", opts)
+				keymap.set("n", "<leader>k", "<cmd>Lspsaga hover_doc<CR>", opts)
 
 				opts.desc = "Rust hover actions (go to trait/impl)"
 				keymap.set("n", "<leader>ha", function()

@@ -45,6 +45,19 @@ return {
 			group = vim.api.nvim_create_augroup("johnlyon_startup_layout", { clear = true }),
 			callback = function()
 				local args = vim.fn.argv()
+
+				-- 守卫：cwd 有保存的 session → 让 auto-session 的 post_restore_cmds 接管 layout。
+				-- 否则 alpha 这里 schedule 的 tree.open() 会和 session 恢复 race，
+				-- 在编辑器单窗口状态下 vsp 出一个孤儿编辑器列（"右侧大黑块"）。
+				if #args == 0 then
+					local cwd = vim.fn.getcwd()
+					local session = vim.fn.stdpath("data") .. "/sessions/"
+						.. cwd:gsub("/", "%%2F") .. ".vim"
+					if vim.fn.filereadable(session) == 1 then
+						return
+					end
+				end
+
 				local should_layout = false
 
 				if #args == 0 then

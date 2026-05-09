@@ -203,16 +203,18 @@ return {
       vim.cmd("bdelete!")
     end, { desc = "Kill current terminal" })
 
-    -- 在终端 buffer 里按 gf：把光标下文件在「编辑器窗口」中打开，
-    -- 而不是替换掉当前终端窗口。支持 path:line(:col) 后缀。
-    local function term_gf()
+    -- 终端 normal 模式下按 <CR>：
+    --   - 光标下能解析出有效文件路径 → 在「编辑器窗口」中打开（不替换终端）
+    --   - 支持 "path:line:col" 后缀
+    --   - 解析失败 notify 报错，不影响终端
+    local function term_open_under_cursor()
       local cfile = vim.fn.expand("<cfile>")
       if cfile == "" then
         vim.notify("No file under cursor", vim.log.levels.WARN)
         return
       end
 
-      -- 解析当前行里 cfile 后面可能跟着的 :line:col
+      -- 解析 cfile 后面可能跟着的 :line:col
       local cur_line = vim.api.nvim_get_current_line()
       local _, _, l, c = cur_line:find(vim.pesc(cfile) .. ":(%d+):?(%d*)")
       local lnum = tonumber(l)
@@ -229,10 +231,8 @@ return {
         return
       end
 
-      -- 找当前 tab 里第一个「普通文件 buffer」的窗口
-      -- 必须是 buftype == ""（普通文件），自动排除：
-      --   terminal / nvim-tree(nofile) / quickfix / help / alpha 等特殊 buffer
-      -- 否则在 tree 窗口里 :edit 会替换掉 tree 的 buffer，触发 nvim-tree 自我重建
+      -- 找当前 tab 第一个普通文件 buffer 的窗口（buftype == ""）
+      -- 自动排除 terminal / nvim-tree(nofile) / quickfix / help / alpha
       local target_win
       for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
         local cfg = vim.api.nvim_win_get_config(win)
@@ -248,7 +248,6 @@ return {
       if target_win then
         vim.api.nvim_set_current_win(target_win)
       else
-        -- 没有编辑器窗口，在终端上方开一个
         vim.cmd("aboveleft split")
       end
 
@@ -261,7 +260,7 @@ return {
     -- 给所有 :terminal 打开的 buffer（含裸 split 出的 pane）做几件事：
     --   1) 设为 unlisted，避免出现在 bufferline / :ls 列表（终端走 <leader>tl 管理）
     --   2) 禁止 <C-w>o / <C-w>O 把当前窗口设为唯一窗口（终端被"全屏化"的元凶）
-    --   3) 重写 gf：在编辑器窗口打开，而不是替换终端
+    --   3) <CR> 在编辑器窗口打开光标下文件路径（不替换终端）
     vim.api.nvim_create_autocmd("TermOpen", {
       group = vim.api.nvim_create_augroup("johnlyon_term_protect", { clear = true }),
       callback = function(args)
@@ -271,7 +270,7 @@ return {
         vim.keymap.set("t", "<C-w>O", "<Nop>", opts)
         vim.keymap.set("n", "<C-w>o", "<Nop>", opts)
         vim.keymap.set("n", "<C-w>O", "<Nop>", opts)
-        vim.keymap.set("n", "gf", term_gf,
+        vim.keymap.set("n", "<CR>", term_open_under_cursor,
           vim.tbl_extend("force", opts, { desc = "Open file under cursor in editor window" }))
       end,
     })

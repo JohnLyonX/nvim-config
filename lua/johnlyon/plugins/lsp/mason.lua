@@ -68,6 +68,13 @@ return {
 			ensure_installed = lsp_servers,
 			-- auto-install configured servers (with lspconfig)
 			automatic_installation = true, -- not the same as ensure_installed
+			-- mason-lspconfig 2.x 默认 automatic_enable = true，会把 mason 里
+			-- 所有装过的服务器自动 enable。rust_analyzer 已经由 rustaceanvim 接管，
+			-- 不能让 mason 再起一个，否则 :LspInfo 里会有两个 rust-analyzer 同时跑，
+			-- gf / gd 之类会返回重复定义。
+			automatic_enable = {
+				exclude = { "rust_analyzer" },
+			},
 		})
 
 		mason_tool_installer.setup({
