@@ -74,9 +74,80 @@ keymap.set("n", "<leader>tf", "<cmd>tabnew %<CR>", { desc = "Open current buffer
 -- 如需 tab 切换，用 :tabn / :tabp 命令。
 
 -- buffer management
-keymap.set("n", "H", "<cmd>bprevious<CR>", { desc = "Go to previous buffer" })
-keymap.set("n", "L", "<cmd>bnext<CR>", { desc = "Go to next buffer" })
-keymap.set("n", "<leader>bx", "<cmd>bdelete!<CR>", { desc = "Close current buffer" })
+-- H / L 切 buffer 时，如果光标在终端 / tree / 浮窗等特殊 buffer 里，
+-- 先切到第一个普通文件 buffer 的窗口再切 —— 否则 :bnext/bprev 会把终端 buffer
+-- 替换成代码文件，终端"消失"。
+local function smart_buffer_switch(cmd)
+  return function()
+    if vim.bo.buftype ~= "" then
+      for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+        local cfg = vim.api.nvim_win_get_config(win)
+        if cfg.relative == "" then
+          local buf = vim.api.nvim_win_get_buf(win)
+          if vim.bo[buf].buftype == "" then
+            vim.api.nvim_set_current_win(win)
+            break
+          end
+        end
+      end
+    end
+    vim.cmd(cmd)
+  end
+end
+keymap.set("n", "H", smart_buffer_switch("bprevious"), { desc = "Go to previous buffer" })
+keymap.set("n", "L", smart_buffer_switch("bnext"),     { desc = "Go to next buffer" })
+-- 关闭 buffer 的 IDE 风行为：
+--   - 优先把当前窗口切到「左邻」buffer，没有左邻就切到「右邻」
+--   - 都没有 → 关掉后展示 alpha 启动页（不让窗口变空 / tree 撑满）
+-- 同时给 bufferline 的 X / 右键复用（见 bufferline.lua），所以挂全局名字。
+_G.SmartBufferClose = function(target_buf)
+  target_buf = target_buf or vim.api.nvim_get_current_buf()
+
+  -- 取所有"真文件 buffer"（listed + buftype == ""），按 buffer id 顺序
+  -- 这就是 bufferline 默认的展示顺序
+  local bufs = vim.tbl_filter(function(b)
+    return vim.api.nvim_buf_is_loaded(b)
+       and vim.bo[b].buflisted
+       and vim.bo[b].buftype == ""
+  end, vim.api.nvim_list_bufs())
+
+  -- 找目标 buffer 在列表里的位置
+  local idx
+  for i, b in ipairs(bufs) do
+    if b == target_buf then idx = i; break end
+  end
+
+  -- 不在 listed file buffer 里（终端 / 特殊 buffer）→ 直接删
+  if not idx then
+    pcall(vim.api.nvim_buf_delete, target_buf, { force = true })
+    return
+  end
+
+  -- 优先左邻，再右邻
+  local replacement = bufs[idx - 1] or bufs[idx + 1]
+
+  -- 当前显示该 buffer 的所有窗口都先切到 replacement（没有就先放个空 buffer）
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    if vim.api.nvim_win_get_buf(win) == target_buf then
+      if replacement then
+        vim.api.nvim_win_set_buf(win, replacement)
+      else
+        local empty = vim.api.nvim_create_buf(false, true)
+        vim.api.nvim_win_set_buf(win, empty)
+      end
+    end
+  end
+
+  pcall(vim.api.nvim_buf_delete, target_buf, { force = true })
+
+  -- 没有 replacement → 在当前窗口展示 alpha 启动页
+  if not replacement then
+    pcall(function() require("alpha").start(false) end)
+  end
+end
+
+keymap.set("n", "<leader>bx", function() _G.SmartBufferClose() end,
+  { desc = "Close current buffer (smart: prev → next → alpha)" })
 keymap.set("n", "<leader>box", "<cmd>%bd|e#|bd#<CR>", { desc = "Close all buffers except current" })
 
 -- 退出 nvim
