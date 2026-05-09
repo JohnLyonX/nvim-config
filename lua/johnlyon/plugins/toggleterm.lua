@@ -85,6 +85,7 @@ return {
 
       vim.cmd("belowright 15split")
       h_state.win = vim.api.nvim_get_current_win()
+      vim.wo[h_state.win].winfixheight = true
 
       if h_state.buf and vim.api.nvim_buf_is_valid(h_state.buf) then
         vim.api.nvim_set_current_buf(h_state.buf)

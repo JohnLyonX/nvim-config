@@ -48,7 +48,21 @@ opt.cmdheight = 0
 
 -- 禁止鼠标拖拽 statusline / 窗口分隔条改变窗口大小
 -- 保留点击与滚轮，仅屏蔽 LeftDrag（这是 Neovim 改窗口尺寸的内建行为）
-vim.keymap.set({ "n", "i", "v", "c", "t" }, "<LeftDrag>", "<LeftMouse>", { silent = true })
+-- 注意：双击/三击后再拖拽会触发 <2-LeftDrag>/<3-LeftDrag>，要一并拦住
+for _, key in ipairs({ "<LeftDrag>", "<2-LeftDrag>", "<3-LeftDrag>", "<4-LeftDrag>" }) do
+  vim.keymap.set({ "n", "i", "v", "c", "t" }, key, "<LeftMouse>", { silent = true })
+end
+
+-- 兜底：若 cmdheight 被改（例如鼠标拖底部 statusline 漏过 LeftDrag 拦截），
+-- 立刻复位回 0，保持 statusline 钉在最底部
+vim.api.nvim_create_autocmd("OptionSet", {
+  pattern = "cmdheight",
+  callback = function()
+    if vim.v.option_new ~= 0 then
+      vim.schedule(function() vim.o.cmdheight = 0 end)
+    end
+  end,
+})
 
 -- 内置终端打开后立即进入 insert 模式，避免 normal 模式误吞按键
 vim.api.nvim_create_autocmd("TermOpen", {

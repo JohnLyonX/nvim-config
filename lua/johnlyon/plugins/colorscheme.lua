@@ -25,7 +25,10 @@ return {
 				dimInactive = false,       -- 非活动窗口变暗
 				terminalColors = true,
 			})
-			vim.cmd.colorscheme("kanagawa")
+			-- 仅在没有任何主题已加载时兜底；colorscheme-persist 启动后会优先恢复用户上次选择
+			if not vim.g.colors_name then
+				vim.cmd.colorscheme("kanagawa")
+			end
 		end,
 	},
 	-- 旧主题保留（不会自动加载，priority 默认 50；想用就改 priority=1000 并注释掉上面）
