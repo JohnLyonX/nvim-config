@@ -81,7 +81,7 @@ keymap.set("n", "<leader>box", "<cmd>%bd|e#|bd#<CR>", { desc = "Close all buffer
 
 -- 退出 nvim
 keymap.set("n", "<leader>qq", "<cmd>qa!<CR>", { desc = "Quit all (force, discard changes)" })
-keymap.set("n", "<leader>qw", "<cmd>xa<CR>",  { desc = "Save changed + quit all" })
+keymap.set("n", "<leader>qw", "<cmd>xa!<CR>", { desc = "Save changed + force quit all (kill terminals)" })
 keymap.set("n", "<leader>qs", "<cmd>qa<CR>",  { desc = "Safe quit all (warn if unsaved)" })
 
 -- gs: go to line start, gl: go to line end
