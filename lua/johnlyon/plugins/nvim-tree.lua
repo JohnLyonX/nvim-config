@@ -51,6 +51,11 @@ return {
       git = {
         ignore = false,
       },
+      -- 关掉目录劫持：让 alpha-nvim 在 `nvim .` 启动时能接管 layout
+      -- （否则 `nvim .` 会被 nvim-tree 直接占满整个窗口）
+      hijack_directories = {
+        enable = false,
+      },
     })
 
     -- set keymaps

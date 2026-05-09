@@ -96,6 +96,11 @@ return {
       close_command = "bdelete! %d",
       right_mouse_command = "bdelete! %d",
       separator_style = "slant",
+      -- 不在 bufferline 上显示终端 buffer（toggleterm 主终端 + <leader>tn 追加 pane 都过滤掉）。
+      -- 终端切换走 <leader>tl，bufferline 留给真正的源代码 buffer。
+      custom_filter = function(buf_number)
+        return vim.bo[buf_number].buftype ~= "terminal"
+      end,
     },
   },
 }

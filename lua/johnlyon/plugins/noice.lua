@@ -9,7 +9,7 @@ return {
     cmdline = {
       view = "cmdline_popup",
       format = {
-        cmdline     = { icon = " " },
+        cmdline     = { icon = ">" },
         search_down = { icon = " " },
         search_up   = { icon = " " },
         filter      = { icon = "$" },
@@ -64,6 +64,14 @@ return {
         size = { width = 60, height = 10 },
         border = { style = "rounded" },
       },
+      -- 覆盖 LSP hover/signature 弹窗大小，避免 rust-analyzer 给 axum::Json<T>
+      -- 这种长文档把屏幕挡满（默认 max_height=20 + border 比较高）
+      hover = {
+        size = {
+          max_height = 10,
+          max_width = 80,
+        },
+      },
     },
   },
   config = function(_, opts)
@@ -73,6 +81,44 @@ return {
       timeout = 3000,
       stages = "fade",
       render = "compact",
+    })
+
+    -- 把所有 noice 浮窗类高亮组的背景对齐到 NormalFloat：
+    --   1) cmdline 弹窗左边图标区"额外方块"
+    --   2) mini view（右下角 LSP 进度通知）的半透明背景与主题不协调
+    -- 这样换任何主题都自动跟随，不需要为每个主题单独适配。
+    local function fix_noice_hl()
+      local groups = {
+        -- cmdline_popup
+        "NoiceCmdline",
+        "NoiceCmdlinePopup",
+        "NoiceCmdlinePopupBorder",
+        "NoiceCmdlinePopupTitle",
+        "NoiceCmdlineIcon",
+        "NoiceCmdlineIconCmdline",
+        "NoiceCmdlineIconSearch",
+        "NoiceCmdlineIconLua",
+        "NoiceCmdlineIconHelp",
+        "NoiceCmdlineIconFilter",
+        "NoiceCmdlineIconInput",
+        -- mini view（LSP progress 通知）
+        "NoiceMini",
+        "NoiceLspProgressTitle",
+        "NoiceLspProgressClient",
+        "NoiceLspProgressSpinner",
+        "NoiceFormatProgressDone",
+        "NoiceFormatProgressTodo",
+      }
+      local nf = vim.api.nvim_get_hl(0, { name = "NormalFloat", link = false })
+      for _, g in ipairs(groups) do
+        local cur = vim.api.nvim_get_hl(0, { name = g, link = false })
+        vim.api.nvim_set_hl(0, g, vim.tbl_extend("force", cur, { bg = nf.bg }))
+      end
+    end
+    fix_noice_hl()
+    vim.api.nvim_create_autocmd("ColorScheme", {
+      group = vim.api.nvim_create_augroup("NoiceCmdlineHlFix", { clear = true }),
+      callback = fix_noice_hl,
     })
   end,
 }

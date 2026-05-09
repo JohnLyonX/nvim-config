@@ -1,15 +1,37 @@
 return {
 	{
-		"nyoom-engineering/oxocarbon.nvim",
+		"rebelot/kanagawa.nvim",
 		priority = 1000,
 		config = function()
-			vim.opt.background = "dark"
-			vim.cmd.colorscheme("oxocarbon")
-			-- 让 nvim 内置终端继承系统终端（iTerm2）的 ANSI 色板
-			for i = 0, 15 do
-				vim.g["terminal_color_" .. i] = nil
-			end
+			require("kanagawa").setup({
+				-- 三个主题：
+				--   "wave"   → 默认，深蓝紫，灵感来自葛饰北斋《神奈川冲浪里》
+				--   "dragon" → 更深更暗，对比度更高，OLED 友好
+				--   "lotus"  → 亮色主题，配 background=light 用
+				theme = "dragon",
+				-- 如果想根据 vim.opt.background 自动切换 dark/light：
+				background = {
+					dark = "dragon",
+					light = "lotus",
+				},
+				compile = false,           -- 启用 :KanagawaCompile 后改 true 加速
+				undercurl = true,
+				commentStyle = { italic = true },
+				functionStyle = {},
+				keywordStyle = { italic = true },
+				statementStyle = { bold = true },
+				typeStyle = {},
+				transparent = false,
+				dimInactive = false,       -- 非活动窗口变暗
+				terminalColors = true,
+			})
+			vim.cmd.colorscheme("kanagawa")
 		end,
+	},
+	-- 旧主题保留（不会自动加载，priority 默认 50；想用就改 priority=1000 并注释掉上面）
+	{
+		"nyoom-engineering/oxocarbon.nvim",
+		lazy = true,
 	},
   -- {
   --   "folke/tokyonight.nvim",
