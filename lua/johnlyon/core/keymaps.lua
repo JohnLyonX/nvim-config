@@ -127,6 +127,9 @@ _G.SmartBufferClose = function(target_buf)
   local replacement = bufs[idx - 1] or bufs[idx + 1]
 
   -- 当前显示该 buffer 的所有窗口都先切到 replacement（没有就先放个空 buffer）
+  -- 同时记一下「编辑器窗口」—— 后面 alpha 兜底要落到这里，而不是当前焦点
+  -- （bufferline 的 X / 右键关 buffer 时，焦点可能在 tree 上）
+  local editor_win
   for _, win in ipairs(vim.api.nvim_list_wins()) do
     if vim.api.nvim_win_get_buf(win) == target_buf then
       if replacement then
@@ -134,14 +137,40 @@ _G.SmartBufferClose = function(target_buf)
       else
         local empty = vim.api.nvim_create_buf(false, true)
         vim.api.nvim_win_set_buf(win, empty)
+        editor_win = editor_win or win
       end
     end
   end
 
   pcall(vim.api.nvim_buf_delete, target_buf, { force = true })
 
-  -- 没有 replacement → 在当前窗口展示 alpha 启动页
+  -- 没有 replacement → 在编辑器窗口展示 alpha 启动页
+  -- alpha.start(false) 会无脑灌进 current window，所以先把焦点切过去
   if not replacement then
+    -- 优先用 bufferline.lua init 里跟踪的 vim.g.main_win（最近一次进过的真文件窗口）
+    if not (editor_win and vim.api.nvim_win_is_valid(editor_win))
+       and vim.g.main_win and vim.api.nvim_win_is_valid(vim.g.main_win) then
+      editor_win = vim.g.main_win
+    end
+    -- 兜底：target_buf 不在任何窗口（关 hidden buffer）且 main_win 也无效
+    -- → 在当前 tab 找一个非 tree / 非终端 / 非浮窗的真窗口
+    if not (editor_win and vim.api.nvim_win_is_valid(editor_win)) then
+      for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+        local cfg = vim.api.nvim_win_get_config(win)
+        if cfg.relative == "" then
+          local b = vim.api.nvim_win_get_buf(win)
+          local bt = vim.bo[b].buftype
+          local ft = vim.bo[b].filetype
+          if bt ~= "terminal" and ft ~= "NvimTree" then
+            editor_win = win
+            break
+          end
+        end
+      end
+    end
+    if editor_win and vim.api.nvim_win_is_valid(editor_win) then
+      vim.api.nvim_set_current_win(editor_win)
+    end
     pcall(function() require("alpha").start(false) end)
   end
 end
