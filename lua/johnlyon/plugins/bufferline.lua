@@ -140,6 +140,9 @@ return {
           filetype = "NvimTree",
           text = "",
           separator = false,
+          -- 用 BufferLineFill 让 offset 区跟 tabline 空白处同色
+          -- 默认会用 Directory 高亮组（橙色），看起来像顶部多了一道色条
+          highlight = "BufferLineFill",
         },
       },
       -- X 按钮和右键关 buffer：走 SmartBufferClose（左邻 → 右邻 → alpha）
