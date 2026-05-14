@@ -23,10 +23,34 @@ keymap.set("n", "<leader>-", "<C-x>", { desc = "Decrement number" }) -- decremen
 -- window management
 keymap.set("n", "<leader>sv", "<c-w>v", { desc = "Split window vertically" }) -- split window vertically
 keymap.set("n", "<leader>sh", "<C-w>s", { desc = "Split window horizontally" }) -- split window horizontally
-keymap.set("t", "<C-h>", [[<C-\><C-n><C-w>h]], { desc = "Move to left split from terminal" })
-keymap.set("t", "<C-j>", [[<C-\><C-n><C-w>j]], { desc = "Move to lower split from terminal" })
-keymap.set("t", "<C-k>", [[<C-\><C-n><C-w>k]], { desc = "Move to upper split from terminal" })
-keymap.set("t", "<C-l>", [[<C-\><C-n><C-w>l]], { desc = "Move to right split from terminal" })
+-- 从终端走 <C-hjkl> 时跳过相邻的其他终端,一路走到非终端窗口(editor / tree)
+-- 才停。修复:右侧终端按 <C-h> 因为终端光标贴 PTY 末尾,被 vim 几何选成
+-- "贴最近的底部终端",每次都要再按一次才到 editor。
+local function term_skip_move(dir)
+  return function()
+    -- 退出终端模式 → 终端的 normal 模式,这样后续 wincmd 才能切窗口
+    vim.api.nvim_feedkeys(
+      vim.api.nvim_replace_termcodes("<C-\\><C-n>", true, false, true),
+      "n", false)
+    -- 模式切换是异步的,要 schedule 到下一个 tick 再做窗口跳转
+    vim.schedule(function()
+      local guard = 0
+      while guard < 10 do
+        local before = vim.api.nvim_get_current_win()
+        vim.cmd("wincmd " .. dir)
+        local after = vim.api.nvim_get_current_win()
+        if before == after then break end                -- 该方向没有更多窗口
+        if vim.bo.buftype ~= "terminal" then break end   -- 落到非终端 → 完成
+        guard = guard + 1
+      end
+    end)
+  end
+end
+
+keymap.set("t", "<C-h>", term_skip_move("h"), { desc = "Move to left split (skip terminals)" })
+keymap.set("t", "<C-j>", term_skip_move("j"), { desc = "Move to lower split (skip terminals)" })
+keymap.set("t", "<C-k>", term_skip_move("k"), { desc = "Move to upper split (skip terminals)" })
+keymap.set("t", "<C-l>", term_skip_move("l"), { desc = "Move to right split (skip terminals)" })
 -- 注：原 <leader>stv / <leader>sth / <leader>stt（裸 :split | terminal）
 -- 已删除，统一由 toggleterm 管理：
 --   <leader>t   浮动终端

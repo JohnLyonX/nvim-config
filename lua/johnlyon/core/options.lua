@@ -1,5 +1,12 @@
 local opt = vim.opt -- for conciseness
 
+-- 禁用未使用的 provider —— 跳过启动时对这些解释器的 spawn 探测，省 30-80ms
+-- 用到任意一个再注释掉对应行即可
+vim.g.loaded_python3_provider = 0
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_ruby_provider = 0
+vim.g.loaded_node_provider = 0
+
 -- line numbers
 opt.relativenumber = true -- show relative line numbers
 opt.number = true -- shows absolute line number on cursor line (when relative number is on)
@@ -89,11 +96,21 @@ vim.api.nvim_create_autocmd("TermOpen", {
   end,
 })
 
--- 切回已有终端 buffer 时也自动进 insert
+-- 切回已有终端 buffer 时:
+--   - 上次光标停在底部(最后两行之内)→ 自动进 insert,继续打字流畅
+--   - 上次光标在上方(说明在用 normal 模式滚 / 读历史)→ 保持 normal,
+--     不强制跳底部
+-- 修复:右侧/底部终端切焦点后被拽回最底部、丢失滚动位置的问题。
 vim.api.nvim_create_autocmd("BufEnter", {
   group = "johnlyon_term",
   pattern = "term://*",
-  command = "startinsert",
+  callback = function(args)
+    local cur_line = vim.api.nvim_win_get_cursor(0)[1]
+    local last_line = vim.api.nvim_buf_line_count(args.buf)
+    if last_line - cur_line <= 1 then
+      vim.cmd("startinsert")
+    end
+  end,
 })
 
 -- ─────────────────────────────────────────────────────────────────────────────

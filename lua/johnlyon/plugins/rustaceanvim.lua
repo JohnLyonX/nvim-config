@@ -47,13 +47,13 @@ return {
 				local opts = { noremap = true, silent = true, buffer = bufnr }
 
 				opts.desc = "Show LSP references"
-				keymap.set("n", "gR", "<cmd>Telescope lsp_references<CR>", opts)
+				keymap.set("n", "gR", "<cmd>FzfLua lsp_references<CR>", opts)
 
 				opts.desc = "Go to declaration"
 				keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
 
 				opts.desc = "Show LSP definitions"
-				keymap.set("n", "gd", "<cmd>Telescope lsp_definitions<CR>", opts)
+				keymap.set("n", "gd", "<cmd>FzfLua lsp_definitions<CR>", opts)
 
 				opts.desc = "Go to definition (LSP, replaces default gf)"
 				-- 默认 gf 在 rust 里经常误开成 cwd 下的同名目录（exercises / solutions 等）。
@@ -61,10 +61,10 @@ return {
 				keymap.set("n", "gf", vim.lsp.buf.definition, opts)
 
 				opts.desc = "Show LSP implementations"
-				keymap.set("n", "gi", "<cmd>Telescope lsp_implementations<CR>", opts)
+				keymap.set("n", "gi", "<cmd>FzfLua lsp_implementations<CR>", opts)
 
 				opts.desc = "Show LSP type definitions"
-				keymap.set("n", "gt", "<cmd>Telescope lsp_type_definitions<CR>", opts)
+				keymap.set("n", "gt", "<cmd>FzfLua lsp_typedefs<CR>", opts)
 
 				opts.desc = "See available code actions"
 				keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, opts)
@@ -73,7 +73,7 @@ return {
 				keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
 
 				opts.desc = "Show buffer diagnostics"
-				keymap.set("n", "<leader>D", "<cmd>Telescope diagnostics bufnr=0<CR>", opts)
+				keymap.set("n", "<leader>D", "<cmd>FzfLua diagnostics_document<CR>", opts)
 
 				opts.desc = "Show line diagnostics"
 				keymap.set("n", "<leader>d", vim.diagnostic.open_float, opts)
@@ -84,8 +84,8 @@ return {
 				opts.desc = "Go to next diagnostic"
 				keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
 
-				opts.desc = "Show documentation for what is under cursor"
-				keymap.set("n", "<leader>k", "<cmd>Lspsaga hover_doc<CR>", opts)
+				-- 注:<leader>k 已删除。文档查看走默认 K(vim.lsp.buf.hover),
+				-- 滚动浮窗用 <C-f> / <C-b>(见 lspsaga.lua 的 smart_scroll)。
 
 				opts.desc = "Rust hover actions (go to trait/impl)"
 				keymap.set("n", "<leader>ha", function()

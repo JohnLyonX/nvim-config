@@ -25,10 +25,9 @@ return {
 				dimInactive = false,       -- 非活动窗口变暗
 				terminalColors = true,
 			})
-			-- 仅在没有任何主题已加载时兜底；colorscheme-persist 启动后会优先恢复用户上次选择
-			if not vim.g.colors_name then
-				vim.cmd.colorscheme("kanagawa")
-			end
+			-- 不再在这里兜底 :colorscheme —— root init.lua 末尾的 core.colorscheme.apply()
+			-- 会从存档恢复,或在缺失时回落到 fallback "kanagawa"。
+			-- 在这里再调一次只会让启动多 source 一次 colors/kanagawa.vim,白白浪费 ~3ms。
 		end,
 	},
 	-- 旧主题保留（不会自动加载，priority 默认 50；想用就改 priority=1000 并注释掉上面）

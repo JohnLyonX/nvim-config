@@ -67,8 +67,8 @@ return {
 			opts.desc = "Go to next diagnostic"
 			keymap.set("n", "]d", vim.diagnostic.goto_next, opts) -- jump to next diagnostic in buffer
 
-			opts.desc = "Show documentation for what is under cursor"
-			keymap.set("n", "<leader>k", "<cmd>Lspsaga hover_doc<CR>", opts)
+			-- 注:<leader>k 已删除。文档查看走默认 K(vim.lsp.buf.hover),
+			-- 滚动浮窗用 <C-f> / <C-b>(见 lspsaga.lua 的 smart_scroll)。
 
 			opts.desc = "Restart LSP"
 			keymap.set("n", "<leader>rs", ":LspRestart<CR>", opts) -- mapping to restart lsp if necessary
